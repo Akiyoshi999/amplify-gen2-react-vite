@@ -5,7 +5,9 @@ frontend:
       commands:
         - npm ci --cache .npm --prefer-offline
         # - npx ampx generate outputs --stack $STACK_ID
-        - npx ampx pipeline-deploy --branch main --app-id d39omevaqbfkqw
+        - echo $APP_ID
+        - echo $BRANCH
+        - npx ampx pipeline-deploy --branch $BRANCH --app-id $APP_ID
     build:
       commands:
         - echo "BUILD START"
