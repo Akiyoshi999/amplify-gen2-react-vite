@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
+import { useState } from "react";
+import "./App.css";
+import { Authenticator } from "@aws-amplify/ui-react";
+import outputs from "../amplify_outputs.json";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [text, setText] = useState("");
+
+  async function invokeHelloWorld() {
+    const { credentials } = await fetchAuthSession();
+    const awsRegion = outputs.auth.aws_region;
+    const funcName = outputs.custom.helloWolrdLambdaName;
+    const lambda = new LambdaClient({ credentials, region: awsRegion });
+    const command = new InvokeCommand({
+      FunctionName: funcName,
+    });
+    const apiResponse = await lambda.send(command);
+    if (apiResponse.Payload) {
+      const decodePayload = JSON.parse(
+        new TextDecoder().decode(apiResponse.Payload)
+      );
+      const payload = JSON.parse(decodePayload.body);
+      setText(payload.message);
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Authenticator>
+      {({ user, signOut }) => (
+        <div>
+          <h1>Hello {user?.username}</h1>
+          <button onClick={signOut}>Sign out</button>
+          <p>
+            <button onClick={invokeHelloWorld}>invoke</button>
+            <div>{text}</div>
+          </p>
+        </div>
+      )}
+    </Authenticator>
+  );
 }
 
-export default App
+export default App;
