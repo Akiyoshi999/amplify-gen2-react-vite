@@ -4,7 +4,7 @@ frontend:
     preBuild:
       commands:
         - npm ci --cache .npm --prefer-offline
-        - npx ampx generate outputs
+        - npx ampx generate outputs --stack $STACK_ID
     build:
       commands:
         - echo "BUILD START"
