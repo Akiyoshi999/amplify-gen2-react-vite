@@ -4,6 +4,7 @@ import "./App.css";
 import { Authenticator } from "@aws-amplify/ui-react";
 import outputs from "../amplify_outputs.json";
 import { fetchAuthSession } from "aws-amplify/auth";
+import ResultApi from "./features/ResultApi";
 
 function App() {
   const [text, setText] = useState("");
@@ -32,10 +33,9 @@ function App() {
         <div>
           <h1>Hello {user?.username}</h1>
           <button onClick={signOut}>Sign out</button>
-          <p>
-            <button onClick={invokeHelloWorld}>invoke</button>
-            <div>{text}</div>
-          </p>
+          <button onClick={invokeHelloWorld}>invoke</button>
+          <div>{text}</div>
+          <ResultApi />
         </div>
       )}
     </Authenticator>
